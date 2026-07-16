@@ -2,7 +2,7 @@
 
 ## 当前已配置内容
 
-### Skills（23个）
+### Skills（25个）
 
 | 类别 | Skill | 功能 | Windows | Linux/macOS |
 |------|-------|------|---------|-------------|
@@ -29,6 +29,8 @@
 | | `writing-skills` | 创建/编辑 skills | ✅ | ✅ |
 | | `opencode-skill-creator` | 创建/测试/评估 skills | ✅ | ✅ |
 | | `dispatching-parallel-agents` | 并行任务执行 | ✅ | ✅ |
+| 文档 | `context7` | 实时库文档查询 | ✅ | ✅ |
+| 网络 | `firecrawl` | 网页爬取/搜索/抓取 | ✅ | ✅ |
 
 ### Plugins（3个）
 
@@ -38,12 +40,13 @@
 | `opencode-skill-creator` | Skill 创建工具 |
 | `./plugins/superpowers.js` | 超级能力插件（hooks） |
 
-### MCP 服务器（2个）
+### MCP 服务器（3个）
 
 | MCP | 类型 | 功能 | 说明 |
 |-----|------|------|------|
 | `infra-ops` | local | 92个基础设施工具 | 需要 `npm install -g github:skyvanguard/infra-ops-mcp` |
 | `composio` | remote | 500+ 应用集成 | 首次使用需 OAuth 认证 |
+| `context7` | remote | 实时库文档搜索 | 无需认证，免费使用 |
 
 ## 平台适配
 
@@ -71,9 +74,53 @@ Docker 容器都正常吗
 帮我扫一下项目有没有安全漏洞
 ```
 
+### Context7
+
+Context7 提供实时库文档查询，替代过时的训练数据：
+
+```bash
+# 安装
+npx ctx7 setup --opencode
+
+# 使用
+use context7 to show me how to set up middleware in Next.js 15
+```
+
+也可以通过 MCP 直接连接（无需安装）：
+```json
+{
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  }
+}
+```
+
+### Firecrawl
+
+Firecrawl 提供网页爬取、搜索和抓取功能：
+
+```bash
+# 安装 CLI
+npm install -g firecrawl-cli
+
+# 认证
+firecrawl login --browser
+# 或
+export FIRECRAWL_API_KEY=fc-your-api-key
+```
+
 ### Composio
 
-首次使用时会弹出浏览器让你 OAuth 登录授权。
+首次使用时需要认证：
+
+```bash
+opencode mcp auth composio
+```
+
+然后在浏览器中完成 OAuth 登录授权。
 
 ## 其他机器同步
 
@@ -149,12 +196,78 @@ npm install -g github:skyvanguard/infra-ops-mcp
 opencode mcp auth composio
 ```
 
+### Context7 文档查询失败
+
+```bash
+# 检查 CLI 版本
+npx ctx7@latest --version
+
+# 重新安装
+npx ctx7 setup --opencode
+```
+
+### Firecrawl 认证失败
+
+```bash
+# 检查 API key
+echo $FIRECRAWL_API_KEY
+
+# 重新登录
+firecrawl login --browser
+```
+
 ### Skills 没有加载
 
 检查 `~/.config/opencode/skills/` 目录是否存在且包含 SKILL.md 文件。
+
+### ECC 安装问题
+
+```bash
+# 安装 ECC
+npm install ecc-universal
+
+# 或直接克隆使用
+git clone https://github.com/affaan-m/ECC.git /tmp/ecc
+cd /tmp/ecc && opencode
+```
 
 ### Shell 配置错误
 
 脚本会自动检测平台，如果手动修改，请确保：
 - Windows 使用 `powershell`
 - Linux/macOS 使用 `bash`
+
+## Skill 市场和资源
+
+### 在线市场
+
+| 市场 | 地址 | 说明 |
+|------|------|------|
+| SkillsMP | https://skillsmp.com | 2,000,000+ skills，最大的市场 |
+| Skill Store | https://skillstore.io | 精选市场，质量较高 |
+| Skills.sh | https://skills.sh | Skills 目录和排行榜 |
+| awesome-opencode | https://github.com/TheArchitectit/awesome-opencode-skills | 精选 skill 列表 |
+
+### 推荐 Skills 仓库
+
+| 仓库 | 说明 | 安装方式 |
+|------|------|----------|
+| [farmage/opencode-skills](https://github.com/farmage/opencode-skills) | 66个专业 skills（K8s, Terraform, Docker, SRE, 监控等） | `curl -fsSL https://raw.githubusercontent.com/farmage/opencode-skills/main/install.sh \| bash` |
+| [affaan-m/ECC](https://github.com/affaan-m/ECC) | Agent harness 性能优化系统（agents, commands, skills, hooks） | `npm install ecc-universal` |
+| [upstash/context7](https://github.com/upstash/context7) | 实时库文档查询 CLI | `npx ctx7 setup --opencode` |
+| [firecrawl/skills](https://github.com/firecrawl/skills) | 网页爬取/搜索 skills | `npx -y firecrawl-cli@latest init --all --browser` |
+| [obra/superpowers](https://github.com/obra/superpowers) | 超级能力插件（已安装） | 已配置 |
+
+### 手动安装新 Skill
+
+```bash
+# 1. 下载 skill 到 skills 目录
+git clone https://github.com/user/repo.git ~/.config/opencode/skills/skill-name
+
+# 2. 确保 SKILL.md 存在
+ls ~/.config/opencode/skills/skill-name/SKILL.md
+
+# 3. 重启 OpenCode
+```
+
+## 故障排除
