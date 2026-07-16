@@ -1,0 +1,14 @@
+# 忽略敏感信息和缓存
+*.log
+*.tmp
+*.bak
+.cache/
+mcp-auth.json
+
+# 忽略 node_modules
+node_modules/
+
+# 保留目录结构
+!plugins/
+!skills/
+!commands/
