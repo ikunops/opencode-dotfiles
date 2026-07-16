@@ -1,0 +1,6 @@
+{
+  "shell": "bash",
+  "skills": {
+    "exclude": ["troubleshoot"]
+  }
+}
