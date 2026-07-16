@@ -1,5 +1,12 @@
 {
+  "name": "opencode-config",
+  "version": "1.0.0",
+  "description": "OpenCode config sync",
   "dependencies": {
-    "@opencode-ai/plugin": "1.17.18"
+    "@opencode-ai/plugin": "1.17.18",
+    "infra-ops-mcp": "github:skyvanguard/infra-ops-mcp"
+  },
+  "scripts": {
+    "sync": "node sync.js"
   }
 }
