@@ -16,6 +16,16 @@
       "type": "remote",
       "url": "https://connect.composio.dev/mcp",
       "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "open-computer-use": {
+      "type": "local",
+      "command": ["open-computer-use"],
+      "enabled": true
     }
   }
 }
