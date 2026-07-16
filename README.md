@@ -116,17 +116,24 @@ use context7 to show me how to set up middleware in Next.js 15
 
 ### Firecrawl
 
-Firecrawl 提供网页爬取、搜索和抓取功能：
+Firecrawl 提供网页爬取、搜索和抓取功能。**需要先注册账号获取 API Key**：
+
+1. 访问 [firecrawl.dev](https://firecrawl.dev) 注册账号
+2. 在控制台获取 API Key（格式：`fc-xxx`）
+3. 配置认证：
 
 ```bash
 # 安装 CLI
 npm install -g firecrawl-cli
 
-# 认证
+# 方式一：浏览器登录（推荐）
 firecrawl login --browser
-# 或
+
+# 方式二：设置 API Key
 export FIRECRAWL_API_KEY=fc-your-api-key
 ```
+
+免费套餐包含每月 500 次爬取。
 
 ### Composio
 
