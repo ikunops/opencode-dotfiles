@@ -2,7 +2,7 @@
 
 ## 当前已配置内容
 
-### Skills（25个）
+### Skills（295个）
 
 | 类别 | Skill | 功能 | Windows | Linux/macOS |
 |------|-------|------|---------|-------------|
@@ -31,6 +31,22 @@
 | | `dispatching-parallel-agents` | 并行任务执行 | ✅ | ✅ |
 | 文档 | `context7` | 实时库文档查询 | ✅ | ✅ |
 | 网络 | `firecrawl` | 网页爬取/搜索/抓取 | ✅ | ✅ |
+| ECC | `api-design` | API 设计最佳实践 | ✅ | ✅ |
+| | `architecture-designer` | 架构设计 | ✅ | ✅ |
+| | `code-reviewer` | 代码审查 | ✅ | ✅ |
+| | `security-reviewer` | 安全审查 | ✅ | ✅ |
+| | `test-master` | 测试专家 | ✅ | ✅ |
+| | `tdd-workflow` | TDD 工作流 | ✅ | ✅ |
+| | `debugging-wizard` | 调试向导 | ✅ | ✅ |
+| | `documentation-expert` | 文档专家 | ✅ | ✅ |
+| DevOps | `terraform` | Terraform 最佳实践 | ✅ | ✅ |
+| | `sre` | SRE 实践 | ✅ | ✅ |
+| | `monitoring` | 监控实践 | ✅ | ✅ |
+| | `security-review` | 安全审查 | ✅ | ✅ |
+| | `docker-ci` | Docker/CI 实践 | ✅ | ✅ |
+| | `cloud-architecture` | 云架构 | ✅ | ✅ |
+| | `chaos-engineering` | 混沌工程 | ✅ | ✅ |
+| | `embedded-systems` | 嵌入式系统 | ✅ | ✅ |
 
 ### Plugins（3个）
 
