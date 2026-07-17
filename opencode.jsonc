@@ -5,13 +5,6 @@
     "opencode-skill-creator",
     "./plugins/superpowers.js"
   ],
-  "provider": {
-    "openkilo": {
-      "name": "OpenKilo",
-      "apiKey": "anonymous",
-      "baseURL": "https://api.kilo.ai/api/openrouter/"
-    }
-  },
   "shell": "powershell",
   "mcp": {
     "infra-ops": {
