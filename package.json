@@ -4,7 +4,8 @@
   "description": "OpenCode config sync",
   "dependencies": {
     "@opencode-ai/plugin": "1.17.18",
-    "infra-ops-mcp": "github:skyvanguard/infra-ops-mcp"
+    "infra-ops-mcp": "github:skyvanguard/infra-ops-mcp",
+    "openkilo": "^1.0.0"
   },
   "scripts": {
     "sync": "node sync.js"
