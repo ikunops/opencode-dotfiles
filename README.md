@@ -171,6 +171,39 @@ bash /tmp/oc-config/setup.sh
 2. MCP 是否加载：运行 `opencode mcp list`
 3. 测试工具：问一句"看看系统内存"
 
+## 首次拉取后需要做的（每台机器只需一次）
+
+以下内容**不同步到 git**，每台新机器首次拉取后必须手动完成：
+
+### 1. 安装 npm 依赖
+
+```bash
+cd ~/.config/opencode
+npm install
+```
+
+### 2. Composio OAuth 认证
+
+Composio 的认证令牌存在本地凭据中，不会同步到 git。使用涉及第三方应用（Gmail、Slack、GitHub 等）的指令时，OpenCode 会自动提示你点链接授权，或在终端运行：
+
+```bash
+opencode mcp auth composio
+```
+
+然后在浏览器中完成登录。
+
+### 3. infra-ops-mcp（可选）
+
+如需本地基础设施工具：
+
+```bash
+npm install -g github:skyvanguard/infra-ops-mcp
+```
+
+### 4. Firecrawl（可选）
+
+如需网页爬取/搜索功能，需在 [firecrawl.dev](https://firecrawl.dev) 注册获取 API Key。
+
 ## 更新配置
 
 在任意机器修改后：
