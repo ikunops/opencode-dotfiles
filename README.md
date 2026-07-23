@@ -1,68 +1,103 @@
 # OpenCode 配置同步仓库
 
-## 当前已配置内容
+本仓库用于同步 OpenCode 的跨平台配置、Skills、Plugins、MCP 服务、知识库与初始化脚本。
+当前已将原始 Skills 按“平台 / 框架 / 功能域”三层结构整理，方便按需查找和复用。
 
-### Skills（295个）
+## 仓库结构
 
-| 类别 | Skill | 功能 | Windows | Linux/macOS |
-|------|-------|------|---------|-------------|
-| 数据库 | `postgresql` | PostgreSQL 最佳实践 | ✅ | ✅ |
-| | `mysql` | MySQL/MariaDB 编码标准 | ✅ | ✅ |
-| | `oracle-sql` | Oracle SQL 编码标准 | ✅ | ✅ |
-| | `sql-review` | SQL 审查标准 | ✅ | ✅ |
-| DevOps | `kubernetes` | K8s 最佳实践 | ✅ | ✅ |
-| | `ansible` | Ansible 最佳实践 | ✅ | ✅ |
-| | `troubleshoot` | 故障排除 | ✅ | ⚠️ 部分 |
-| 搜索 | `anysearch` | 实时搜索引擎 | ✅ | ✅ |
-| 开发流程 | `brainstorming` | 创意探索 | ✅ | ✅ |
-| | `writing-plans` | 编写实施计划 | ✅ | ✅ |
-| | `executing-plans` | 执行实施计划 | ✅ | ✅ |
-| | `test-driven-development` | TDD 工作流 | ✅ | ✅ |
-| | `systematic-debugging` | 系统化调试 | ✅ | ✅ |
-| | `subagent-driven-development` | 子代理开发 | ✅ | ✅ |
-| 代码审查 | `receiving-code-review` | 接收代码审查反馈 | ✅ | ✅ |
-| | `requesting-code-review` | 请求代码审查 | ✅ | ✅ |
-| | `verification-before-completion` | 完成前验证 | ✅ | ✅ |
-| Git | `using-git-worktrees` | Git worktree 管理 | ✅ | ✅ |
-| | `finishing-a-development-branch` | 完成开发分支 | ✅ | ✅ |
-| OpenCode | `using-superpowers` | 查找和使用 skills | ✅ | ✅ |
-| | `writing-skills` | 创建/编辑 skills | ✅ | ✅ |
-| | `opencode-skill-creator` | 创建/测试/评估 skills | ✅ | ✅ |
-| | `dispatching-parallel-agents` | 并行任务执行 | ✅ | ✅ |
-| 文档 | `context7` | 实时库文档查询 | ✅ | ✅ |
-| 网络 | `firecrawl` | 网页爬取/搜索/抓取 | ✅ | ✅ |
-| ECC | `api-design` | API 设计最佳实践 | ✅ | ✅ |
-| | `architecture-designer` | 架构设计 | ✅ | ✅ |
-| | `code-reviewer` | 代码审查 | ✅ | ✅ |
-| | `security-reviewer` | 安全审查 | ✅ | ✅ |
-| | `test-master` | 测试专家 | ✅ | ✅ |
-| | `tdd-workflow` | TDD 工作流 | ✅ | ✅ |
-| | `debugging-wizard` | 调试向导 | ✅ | ✅ |
-| | `documentation-expert` | 文档专家 | ✅ | ✅ |
-| DevOps | `terraform` | Terraform 最佳实践 | ✅ | ✅ |
-| | `sre` | SRE 实践 | ✅ | ✅ |
-| | `monitoring` | 监控实践 | ✅ | ✅ |
-| | `security-review` | 安全审查 | ✅ | ✅ |
-| | `docker-ci` | Docker/CI 实践 | ✅ | ✅ |
-| | `cloud-architecture` | 云架构 | ✅ | ✅ |
-| | `chaos-engineering` | 混沌工程 | ✅ | ✅ |
-| | `embedded-systems` | 嵌入式系统 | ✅ | ✅ |
+```
+opencode-dotfiles/
+├─ skills/
+│  ├─ platform-specific/       # 按平台分类
+│  ├─ framework-specific/       # 按框架分类
+│  └─ function-specific/        # 按功能域分类
+├─ knowledge/
+│  └─ ai-safety/                # AI 安全专业知识库
+├─ scripts/
+│  ├─ classify-skills.ps1       # 技能分类脚本
+│  ├─ init-security.ps1         # 初始化安全技能到本地
+│  └─ validate-security.ps1     # 验证安全技能是否已安装
+├─ configs/
+│  └─ security/                 # 安全相关配置
+├─ platforms/                   # 平台特定配置
+├─ plugins/                     # 插件
+├─ README.md                    # 总览
+└─ QUICKSTART.md                # 快速开始
+```
 
-### Plugins（3个）
+## 快速开始
 
-| Plugin | 功能 |
-|--------|------|
-| `openkilo` | 默认插件 |
-| `opencode-skill-creator` | Skill 创建工具 |
-| `./plugins/superpowers.js` | 超级能力插件（hooks） |
+- Windows：`powershell -ExecutionPolicy Bypass -File .\setup.ps1`
+- Linux/macOS：`bash setup.sh`
 
-### MCP 服务器（3个）
+## Skills 现状
 
-| MCP | 类型 | 功能 | 说明 |
-|-----|------|------|------|
-| `infra-ops` | local | 92个基础设施工具 | 需要 `npm install -g github:skyvanguard/infra-ops-mcp` |
-| `composio` | remote | 500+ 应用集成 | 首次使用需 OAuth 认证 |
-| `context7` | remote | 实时库文档搜索 | 无需认证，免费使用 |
+本仓库已整理为三类目录，入口更清晰，查找成本更低：
+
+## 平台特定
+
+- `platform-specific/windows`：Windows 桌面自动化与原生应用相关
+- `platform-specific/linux`：Linux 运维与系统自动化
+- `platform-specific/macos`：macOS 环境与原生开发
+- `platform-specific/android`：Android 架构与工程化
+- `platform-specific/ios`：iOS、Swift 与 Apple 生态
+- `platform-specific/flutter`：Flutter 移动端跨端
+- `platform-specific/react-native`：React Native 移动端
+- `platform-specific/cross-platform`：跨平台通用能力
+- `platform-specific/bun`：Bun 运行时
+- `platform-specific/flox`：Flox 可复现环境
+
+## 框架特定
+
+- `framework-specific/react`：React 组件、性能、测试
+- `framework-specific/vue`：Vue 模式与生态
+- `framework-specific/angular`：Angular 工程化
+- `framework-specific/nextjs`：Next.js 服务端与渲染
+- `framework-specific/nuxt`：Nuxt 工程化
+- `framework-specific/vite`：Vite 构建与插件
+- `framework-specific/django`：Django 架构与安全
+- `framework-specific/laravel`：Laravel 工程化
+- `framework-specific/spring-boot`：Spring Boot 架构
+- `framework-specific/quarkus`：Quarkus 云原生
+- `framework-specific/nestjs`：NestJS 服务端
+- `framework-specific/fastapi`：FastAPI 后端
+- `framework-specific/compose-multiplatform`：Compose Multiplatform
+
+## 功能域特定
+
+- `function-specific/ai-agent`：Agent 架构、评估、自主运行、成本追踪、并行编排
+- `function-specific/backend`：后端模式、API 设计、RPC/TS/Go/.NET
+- `function-specific/database`：PostgreSQL、MySQL、Oracle、SQL Review、迁移、ORM
+- `function-specific/devops`：K8s、Terraform、SRE、监控、网络、Docker
+- `function-specific/frontend`：前端模式、无障碍、动效、设计系统
+- `function-specific/testing`：单测、集成、E2E、压测、基准
+- `function-specific/security`：安全审查、赏金、合规、PHI、DeFi、LLM 安全
+- `function-specific/monitoring`：监控、告警、SLO、可观测性
+- `function-specific/content`：写作、视频、营销、SEO、社交媒体
+- `function-specific/business`：运筹、财务、供应链、库存、预测市场
+- `function-specific/research`：文献、PubMed、USPTO、深度研究
+- `function-specific/integration`：GitHub、Jira、Gmail、Slack、文档、音视频、MCP
+- `function-specific/cloud`：云架构、Homelab、DNS、VLAN、WireGuard
+- `function-specific/data`：数据工程、ClickHouse、推荐系统
+- `function-specific/development-workflow`：需求、计划、TDD、调试、评审、交付
+- `function-specific/language-ecosystem`：各语言标准、测试、编码规范
+- `function-specific/misc`：暂未归类的通用能力
+
+## 安全规则
+
+本仓库包含 `ai-safety-sop` 技能，提供四层漏斗模型与不可逆操作阻断规则。
+
+如需立即应用到本机：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\init-security.ps1
+```
+
+验证：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\validate-security.ps1
+```
 
 ## 平台适配
 
@@ -103,6 +138,7 @@ use context7 to show me how to set up middleware in Next.js 15
 ```
 
 也可以通过 MCP 直接连接（无需安装）：
+
 ```json
 {
   "mcp": {
@@ -169,7 +205,7 @@ bash /tmp/oc-config/setup.sh
 启动 OpenCode，检查：
 1. Skills 是否加载：输入 `/skills` 查看
 2. MCP 是否加载：运行 `opencode mcp list`
-3. 测试工具：问一句"看看系统内存"
+3. 测试工具：问一句“看看系统内存”
 
 ## 首次拉取后需要做的（每台机器只需一次）
 
@@ -327,3 +363,75 @@ ls ~/.config/opencode/skills/skill-name/SKILL.md
 ```
 
 ## 故障排除
+
+### 1. Skills 没有加载
+
+**检查步骤：**
+1. 确认目录存在：`~/.config/opencode/skills/`
+2. 确认 SKILL.md 文件存在
+3. 重启 OpenCode
+
+```bash
+# 验证 skills 目录
+ls -la ~/.config/opencode/skills/
+
+# 检查特定 skill
+ls ~/.config/opencode/skills/ai-safety-sop/SKILL.md
+```
+
+### 2. Hookify 规则未生效
+
+**检查步骤：**
+1. 确认 hookify 规则已安装：`~/.claude/hookify/`
+2. 确认文件扩展名为 `.local.md`
+3. 重启 OpenCode
+
+```bash
+# 查看 hookify 规则
+ls ~/.claude/hookify/*.local.md
+```
+
+### 3. 安全技能未安装
+
+**安装步骤：**
+1. 运行初始化脚本：`.\scripts\init-security.ps1`
+2. 验证安装：`.\scripts\validate-security.ps1`
+3. 重启 OpenCode
+
+### 4. MCP 服务连接失败
+
+**检查步骤：**
+1. 确认网络连接正常
+2. 检查 MCP 配置：`opencode.jsonc`
+3. 重新认证：`opencode mcp auth composio`
+
+### 5. 性能问题
+
+**优化建议：**
+1. 减少同时加载的 skills 数量
+2. 清理未使用的 hooks
+3. 更新到最新版本
+
+```bash
+# 更新 OpenCode
+npm update -g opencode
+
+# 清理缓存
+opencode cache clear
+```
+
+## 相关资源
+
+- [OpenCode 官方文档](https://opencode.ai)
+- [OpenCode Skills 市场](https://skillsmp.com)
+- [Context7 文档查询](https://context7.com)
+- [Firecrawl 网页抓取](https://firecrawl.dev)
+- [Composio 应用集成](https://composio.dev)
+
+## 贡献
+
+欢迎提交 Issue 和 Pull Request 来改进这个仓库。
+
+## 许可
+
+MIT License
