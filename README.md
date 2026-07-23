@@ -99,6 +99,61 @@ powershell -ExecutionPolicy Bypass -File .\scripts\init-security.ps1
 powershell -ExecutionPolicy Bypass -File .\scripts\validate-security.ps1
 ```
 
+## Hookify 规则说明
+
+Hookify 规则用于在运行时拦截危险操作。按生效范围可分为两层：
+
+- **全局规则**：`C:\Users\30849\.claude\hookify\`
+- **项目规则**：`skills/function-specific/development-workflow/ai-safety-sop/hooks/`
+
+当前已启用的规则文件均为 `.local.md`，示例如下：
+
+```yaml
+---
+name: ai-force-plan-first
+enabled: true
+event: prompt
+action: warn
+pattern: .*
+---
+
+# 规划式执行提醒
+
+在执行任何操作前，你必须：
+1. 完整理解任务目标和上下文
+2. 在内部列出执行计划并标注风险点
+3. 如果没有风险点，直接执行，不打扰用户
+4. 如果有风险点，只汇报风险部分，等待用户确认
+5. 用户确认后，重新审视计划是否仍成立，再执行
+
+禁止"做一会儿问一下"的执行模式。
+```
+
+| 字段 | 说明 |
+|------|------|
+| `name` | 规则唯一标识 |
+| `enabled` | 是否启用 |
+| `event` | 触发时机，常用 `prompt` 或 `bash` |
+| `action` | `warn` 或 `block` |
+| `pattern` | 匹配规则，支持正则 |
+| 正文 | 给 AI 的拦截说明与处理流程 |
+
+`action` 说明：
+- `warn`：提醒，通常不硬阻断
+- `block`：直接阻断执行，需要用户确认后再继续
+
+当前仓库中建议按以下结构组织规则：
+
+```
+skills/function-specific/development-workflow/ai-safety-sop/hooks/
+├─ hookify.ai-force-plan-first.local.md
+├─ hookify.ai-block-dangerous-delete.local.md
+├─ hookify.ai-block-database-drop.local.md
+├─ hookify.ai-block-git-destructive.local.md
+├─ hookify.ai-block-service-stop.local.md
+└─ hookify.ai-block-docker-nuke.local.md
+```
+
 ## 平台适配
 
 脚本会自动检测操作系统并应用对应配置：
