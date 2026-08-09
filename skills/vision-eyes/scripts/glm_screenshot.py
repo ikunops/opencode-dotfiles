@@ -56,9 +56,27 @@ def main():
         print(f"[vision] 读取截图失败: {e}", file=sys.stderr)
         sys.exit(1)
 
+    # Reuse glm_vision's provider chain (Zhipu -> MiMo Free -> MiMo Go)
     try:
-        result = g.call_api(g.load_key(), g.DEFAULT_MODEL, urls, args.prompt)
-        print(result)
+        zkey = g.load_zhipu_key()
+        mkey = g.load_mimo_key()
+        chain = [(g.ZHIPU_MODEL, "zhipu", zkey, g.ZHIPU_URL),
+                 (g.ZHIPU_FALLBACK, "zhipu", zkey, g.ZHIPU_URL)]
+        if mkey:
+            chain.append((g.MIMO_FREE_MODEL, "mimo", mkey, g.MIMO_FREE_URL))
+            chain.append((g.MIMO_GO_MODEL, "mimo", mkey, g.MIMO_GO_URL))
+        last_err = None
+        for model, prov, key, url in chain:
+            try:
+                if prov == "mimo":
+                    result = g.call_mimo(key, model, urls, args.prompt, url)
+                else:
+                    result = g.call_zhipu(key, model, urls, args.prompt)
+                print(result)
+                return
+            except Exception as e:
+                last_err = str(e)
+        raise RuntimeError(last_err or "所有模型失败")
     except Exception as e:
         print(f"[vision] 视觉识别失败: {e}", file=sys.stderr)
         sys.exit(1)
