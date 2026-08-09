@@ -7,33 +7,28 @@ description: Give a text-only model (like DeepSeek) eyes via the Zhipu GLM-4.6v 
 
 把图片转成文字描述，让纯文本模型（如 DeepSeek）拥有"眼睛"。
 
-## 配置（必填）
+## 配置
 
-本 skill 需要你自己的智谱（Zhipu AI / BigModel）API Key。两种配置方式（任选其一）：
+API key 与端点已内置在此 skill 中（用户授权配置）：
 
-1. **环境变量**（推荐，全局生效）
-   ```bash
-   # Windows (PowerShell)
-   setx GLM_VISION_API_KEY "你的智谱key"
-   # macOS / Linux
-   export GLM_VISION_API_KEY="你的智谱key"
-   ```
-
-2. **.env 文件**（本 skill 目录内）
-   复制 `.env.example` 为 `.env` 并填入：
-   ```
-   GLM_VISION_API_KEY=你的智谱key
-   ```
-
-获取 Key：https://open.bigmodel.cn/ 注册后创建 API Key（格式为 `xxxxx.yyyyy`）。
-
-### 端点与模型（已内置，无需配置）
-
+- **API Key**: ``
 - **端点**: `https://open.bigmodel.cn/api/paas/v4/chat/completions`
-- **模型**: `glm-4.6v`（视觉多模态，默认）
-- **备用模型**: `glm-4v-plus`（主模型失败自动回退）
+- **模型**: `glm-4.6v`（视觉多模态）
 
-可用 `--model` 参数覆盖。
+如需覆盖配置，设置环境变量 `GLM_VISION_API_KEY`（优先于内置 key）。
+
+## 识别链路（自动回退）
+
+按优先级依次尝试，前一个失败自动用下一个：
+
+1. **智谱 GLM-4.6v**（默认）→ 备用 `glm-4v-plus`
+2. **MiMo-V2.5 Free**（免费，不消耗 Go 配额）
+   - 端点 `https://opencode.ai/zen/v1/chat/completions`，模型 `mimo-v2.5-free`
+   - 自动读取本机 `~/.local/share/opencode/auth.json` 的 opencode-go key
+3. **MiMo-V2.5（Go）**（消耗 Go 订阅配额，最后兜底）
+   - 端点 `https://opencode.ai/zen/go/v1/chat/completions`，模型 `mimo-v2.5`
+
+智谱未配置/失效时自动落到 mimo；mimo 先试 free 版，free 不可用才用 Go 版。可用 `--model` 强制指定（`glm-4.6v` / `glm-4v-plus` / `mimo-v2.5-free` / `mimo-v2.5`）。
 
 ## 用法
 
@@ -46,9 +41,6 @@ python "<skill_dir>/scripts/glm_vision.py" a.png,b.png "对比这两张图"
 
 # 中文描述
 python "<skill_dir>/scripts/glm_vision.py" screenshot.png "用中文详细描述这个界面"
-
-# 截图屏幕区域并描述（Windows，UI 自检）
-python "<skill_dir>/scripts/glm_screenshot.py" X Y 宽 高 "描述要求"
 ```
 
 ## 行为准则
@@ -59,9 +51,9 @@ python "<skill_dir>/scripts/glm_screenshot.py" X Y 宽 高 "描述要求"
 4. **图片格式**：支持 PNG/JPG/JPEG/WebP/BMP；脚本自动转 base64 data URL。
 5. **长图处理**：如果图片过大（>4MB），先压缩再发送。
 6. **多图**：多个图片路径用逗号分隔，脚本组装为多图请求。
-7. **密钥安全**：不要把你的 API Key 提交到任何公开仓库；`.env` 文件应加入 `.gitignore`。
+7. **与悬浮窗集成**：本项目也用于 Go 用量悬浮窗的 UI 自检（截图 → 视觉描述 → 验证渲染）。
 
 ## 注意
 
 - 这是调用外部视觉 API，图片内容会上传到智谱服务器处理，涉及敏感信息时提醒用户。
-- 输出语言由 `LANG` 环境变量或问题措辞决定，默认跟随问题语言。
+- 输出为中文或英文由 `LANG` 环境变量或问题措辞决定，默认跟随问题语言。
