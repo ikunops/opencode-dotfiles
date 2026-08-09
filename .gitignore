@@ -12,3 +12,7 @@ node_modules/
 !plugins/
 !skills/
 !commands/
+
+# secrets
+**/.env
+!**/.env.example
