@@ -1,4 +1,4 @@
-# OpenCode 配置同步仓库
+﻿# OpenCode 配置同步仓库
 
 本仓库用于同步 OpenCode 的跨平台配置、Skills、Plugins、MCP 服务、知识库与初始化脚本。
 当前已将原始 Skills 按“平台 / 框架 / 功能域”三层结构整理，方便按需查找和复用。
@@ -490,3 +490,34 @@ opencode cache clear
 ## 许可
 
 MIT License
+
+## Go 缓存代理 (go-cache-proxy)
+
+本地精确缓存代理, 置于 OpenCode CLI 与 OpenCode Go 之间。完全相同的请求命中本地缓存,
+直接返回, 不消耗 Go 配额 (5h/\, 周/\, 月/\)。
+
+`powershell
+# 后台启动
+.\scripts\start-go-cache.ps1 -Background
+
+# 注册开机自启
+.\scripts\start-go-cache.ps1 -Install
+
+# 移除自启
+.\scripts\start-go-cache.ps1 -Uninstall
+`
+
+原理:
+- 请求体 hash (不含 stream 字段) 作缓存键, 流式/非流式共享缓存
+- 流式请求透传上游并缓冲完整响应; 缓存命中时合成 OpenAI SSE 事件流
+- 命中统计: GET http://127.0.0.1:8787/__stats
+- 清空缓存: POST http://127.0.0.1:8787/__clear
+- 缓存文件存 scripts/.cache/ (已被 .gitignore 忽略)
+
+配置 (opencode.base.jsonc 已内置):
+"provider": { "opencode-go": { "options": { "baseURL": "http://127.0.0.1:8787/v1" } } }
+
+注意事项:
+- 代理必须运行, 否则 opencode-go 请求会失败 (连接拒绝)
+- 语义缓存类工具 (prompt-cache/mimir) 不适用: 前者需 OpenAI/Mistral key,
+  后者流式请求跳过缓存
