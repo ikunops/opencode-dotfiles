@@ -21,3 +21,11 @@ node_modules/
 __pycache__/
 *.pyc
 
+
+# Go 用量 Widget 运行时敏感文件
+scripts/go-usage-widget/config.json
+scripts/go-usage-widget/server_usage.db
+scripts/go-usage-widget/webdata/
+scripts/go-usage-widget/logs/
+scripts/go-usage-widget/pylib/
+
