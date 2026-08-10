@@ -498,13 +498,13 @@ MIT License
 
 `powershell
 # 后台启动
-.\scripts\start-go-cache.ps1 -Background
+.\scripts\go-cache-proxy\start-go-cache.ps1 -Background
 
 # 注册开机自启
-.\scripts\start-go-cache.ps1 -Install
+.\scripts\go-cache-proxy\start-go-cache.ps1 -Install
 
 # 移除自启
-.\scripts\start-go-cache.ps1 -Uninstall
+.\scripts\go-cache-proxy\start-go-cache.ps1 -Uninstall
 `
 
 原理:
@@ -512,21 +512,21 @@ MIT License
 - 流式请求透传上游并缓冲完整响应; 缓存命中时合成 OpenAI SSE 事件流
 - 命中统计: GET http://127.0.0.1:8787/__stats
 - 清空缓存: POST http://127.0.0.1:8787/__clear
-- 缓存文件存 scripts/.cache/ (已被 .gitignore 忽略)
+- 缓存文件存 scripts/go-cache-proxy/.cache/ (已被 .gitignore 忽略)
 
 配置 (opencode.base.jsonc 已内置):
 "provider": { "opencode-go": { "options": { "baseURL": "http://127.0.0.1:8787/v1" } } }
 
 常用命令:
-- 启动 (后台 + baseURL 切到代理): .\scripts\start-go-cache.ps1 -Background
-- 停止 (停代理 + baseURL 恢复直连): .\scripts\stop-go-cache.ps1
-- 注册开机自启: .\scripts\start-go-cache.ps1 -Install
-- 移除自启: .\scripts\start-go-cache.ps1 -Uninstall
-- 查看状态: .\scripts\start-go-cache.ps1 -Status
+- 启动 (后台 + baseURL 切到代理): .\scripts\go-cache-proxy\start-go-cache.ps1 -Background
+- 停止 (停代理 + baseURL 恢复直连): .\scripts\go-cache-proxy\stop-go-cache.ps1
+- 注册开机自启: .\scripts\go-cache-proxy\start-go-cache.ps1 -Install
+- 移除自启: .\scripts\go-cache-proxy\start-go-cache.ps1 -Uninstall
+- 查看状态: .\scripts\go-cache-proxy\start-go-cache.ps1 -Status
 
 关于 "代理必须运行" 的说明 (已内置降级路径):
 - 代理未运行时, opencode-go 请求会连接拒绝 -> 一键恢复直连:
-  powershell -ExecutionPolicy Bypass -File .\scripts\stop-go-cache.ps1
+  powershell -ExecutionPolicy Bypass -File .\scripts\go-cache-proxy\stop-go-cache.ps1
   (停代理 + 把 baseURL 恢复为 https://opencode.ai/zen/go/v1, 重启 opencode 生效)
 - 开机自启已注册 (计划任务 GoCacheProxy), 重启后自动拉起代理
 - start/stop 脚本会自动切换 baseURL, 无需手动改配置
