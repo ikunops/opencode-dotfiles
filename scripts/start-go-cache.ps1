@@ -1,19 +1,23 @@
 ﻿# go-cache-proxy start/auto-start script (Windows, PowerShell 5.1 compatible)
 # Usage:
-#   .\start-go-cache.ps1 -Background    # start in background
+#   .\start-go-cache.ps1 -Background    # start in background + switch baseURL to proxy
 #   .\start-go-cache.ps1 -Install       # register auto-start (scheduled task)
 #   .\start-go-cache.ps1 -Uninstall     # remove auto-start
+#   .\start-go-cache.ps1 -Status        # show proxy status
 #   .\start-go-cache.ps1                # foreground (debug)
 
 param(
     [switch]$Background,
     [switch]$Install,
-    [switch]$Uninstall
+    [switch]$Uninstall,
+    [switch]$Status
 )
 
 $ErrorActionPreference = "Stop"
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $proxyPy = Join-Path $scriptDir "go-cache-proxy.py"
+$configPath = Join-Path $env:USERPROFILE ".config\opencode\opencode.jsonc"
+$proxyBaseUrl = "http://127.0.0.1:8787/v1"
 $taskName = "GoCacheProxy"
 $startupName = "GoCacheProxy"
 
@@ -47,6 +51,53 @@ function Test-ProxyUp {
     }
 }
 
+function Get-ConfiguredBaseUrl {
+    if (Test-Path $configPath) {
+        try {
+            $cfg = Get-Content $configPath -Raw | ConvertFrom-Json
+            return $cfg.provider.'opencode-go'.options.baseURL
+        } catch { }
+    }
+    return $null
+}
+
+function Set-BaseUrlToProxy {
+    if (Test-Path $configPath) {
+        try {
+            $cfg = Get-Content $configPath -Raw | ConvertFrom-Json
+            if (-not $cfg.provider) { $cfg | Add-Member -NotePropertyName "provider" -NotePropertyValue @{} -Force }
+            if (-not $cfg.provider.'opencode-go') { $cfg.provider | Add-Member -NotePropertyName "opencode-go" -NotePropertyValue @{} -Force }
+            if (-not $cfg.provider.'opencode-go'.options) { $cfg.provider.'opencode-go' | Add-Member -NotePropertyName "options" -NotePropertyValue @{} -Force }
+            $cfg.provider.'opencode-go'.options.baseURL = $proxyBaseUrl
+            $cfg | ConvertTo-Json -Depth 10 | Set-Content $configPath -Encoding UTF8
+            Write-Host "[OK] baseURL set to $proxyBaseUrl" -ForegroundColor Green
+            Write-Host "[HINT] restart opencode for config change to take effect" -ForegroundColor Yellow
+        } catch {
+            Write-Host "[WARN] failed to update config: $($_.Exception.Message)" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "[WARN] config not found: $configPath" -ForegroundColor Yellow
+    }
+}
+
+if ($Status) {
+    if (Test-ProxyUp) {
+        Write-Host "[OK] proxy RUNNING (127.0.0.1:8787)" -ForegroundColor Green
+    } else {
+        Write-Host "[ERR] proxy NOT running" -ForegroundColor Red
+    }
+    $cur = Get-ConfiguredBaseUrl
+    if ($cur) {
+        Write-Host "baseURL: $cur" -ForegroundColor Cyan
+        if ($cur -like "http://127.0.0.1:8787*") {
+            Write-Host "mode: PROXY (cache enabled)" -ForegroundColor Green
+        } else {
+            Write-Host "mode: DIRECT (no cache)" -ForegroundColor Yellow
+        }
+    }
+    exit 0
+}
+
 if ($Uninstall) {
     Remove-Item -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run\$startupName" -ErrorAction SilentlyContinue
     schtasks /Delete /TN $taskName /F 2>$null | Out-Null
@@ -64,6 +115,7 @@ if ($Install) {
         Start-ScheduledTask -TaskName $taskName
         Start-Sleep -Seconds 3
     }
+    Set-BaseUrlToProxy
     if (Test-ProxyUp) {
         Write-Host "[OK] proxy running (127.0.0.1:8787)" -ForegroundColor Green
     } else {
@@ -72,19 +124,23 @@ if ($Install) {
     exit 0
 }
 
-if (Test-ProxyUp) {
-    Write-Host "[OK] proxy already running (127.0.0.1:8787)" -ForegroundColor Green
+if ($Background) {
+    if (-not (Test-ProxyUp)) {
+        Start-Process -FilePath $python -ArgumentList "`"$proxyPy`"" -WorkingDirectory $scriptDir -WindowStyle Hidden
+        Start-Sleep -Seconds 4
+    }
+    Set-BaseUrlToProxy
+    if (Test-ProxyUp) {
+        Write-Host "[OK] proxy running (127.0.0.1:8787), baseURL switched to proxy" -ForegroundColor Green
+    } else {
+        Write-Host "[ERR] proxy start failed" -ForegroundColor Red
+    }
     exit 0
 }
 
-if ($Background) {
+# foreground (debug): ensure proxy then run in foreground
+if (-not (Test-ProxyUp)) {
     Start-Process -FilePath $python -ArgumentList "`"$proxyPy`"" -WorkingDirectory $scriptDir -WindowStyle Hidden
     Start-Sleep -Seconds 4
-    if (Test-ProxyUp) {
-        Write-Host "[OK] background start done (127.0.0.1:8787)" -ForegroundColor Green
-    } else {
-        Write-Host "[ERR] background start failed" -ForegroundColor Red
-    }
-} else {
-    & $python $proxyPy
 }
+& $python $proxyPy

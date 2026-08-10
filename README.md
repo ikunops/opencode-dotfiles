@@ -1,4 +1,4 @@
-﻿# OpenCode 配置同步仓库
+# OpenCode 配置同步仓库
 
 本仓库用于同步 OpenCode 的跨平台配置、Skills、Plugins、MCP 服务、知识库与初始化脚本。
 当前已将原始 Skills 按“平台 / 框架 / 功能域”三层结构整理，方便按需查找和复用。
@@ -517,7 +517,18 @@ MIT License
 配置 (opencode.base.jsonc 已内置):
 "provider": { "opencode-go": { "options": { "baseURL": "http://127.0.0.1:8787/v1" } } }
 
-注意事项:
-- 代理必须运行, 否则 opencode-go 请求会失败 (连接拒绝)
+常用命令:
+- 启动 (后台 + baseURL 切到代理): .\scripts\start-go-cache.ps1 -Background
+- 停止 (停代理 + baseURL 恢复直连): .\scripts\stop-go-cache.ps1
+- 注册开机自启: .\scripts\start-go-cache.ps1 -Install
+- 移除自启: .\scripts\start-go-cache.ps1 -Uninstall
+- 查看状态: .\scripts\start-go-cache.ps1 -Status
+
+关于 "代理必须运行" 的说明 (已内置降级路径):
+- 代理未运行时, opencode-go 请求会连接拒绝 -> 一键恢复直连:
+  powershell -ExecutionPolicy Bypass -File .\scripts\stop-go-cache.ps1
+  (停代理 + 把 baseURL 恢复为 https://opencode.ai/zen/go/v1, 重启 opencode 生效)
+- 开机自启已注册 (计划任务 GoCacheProxy), 重启后自动拉起代理
+- start/stop 脚本会自动切换 baseURL, 无需手动改配置
 - 语义缓存类工具 (prompt-cache/mimir) 不适用: 前者需 OpenAI/Mistral key,
   后者流式请求跳过缓存

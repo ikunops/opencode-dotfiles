@@ -36,8 +36,37 @@ CACHE_MAX_BYTES = int(os.environ.get("GOCACHE_MAX_BYTES", "268435456"))  # 256MB
 DEFAULT_UPSTREAM = "https://opencode.ai/zen/go"  # 不含 /v1, 与请求路径拼接
 SSE_CHUNK_TOKENS = 200  # 缓存命中时合成 SSE 的分片大小 (按字符计)
 
-_stats = {"hits": 0, "misses": 0, "bytes_saved": 0, "started": time.time()}
+_stats = {"hits": 0, "misses": 0, "bytes_saved": 0, "tokens_saved": 0,
+          "usd_saved": 0.0, "started": time.time()}
 _stats_lock = threading.Lock()
+
+# 估算省下的费用用 (USD per 1M tokens), 缺省按 deepseek-v4-flash 价
+_PRICES = {
+    "deepseek-v4-flash": (0.14, 0.28),
+    "deepseek-v4-pro": (0.435, 0.87),
+    "glm-5.2": (1.40, 4.40),
+    "glm-5.1": (1.40, 4.40),
+    "gpt-5.6-luna": (0.40, 1.80),
+    "kimi-k3": (3.00, 15.00),
+    "kimi-k2.7-code": (0.95, 4.00),
+    "kimi-k2.6": (0.95, 4.00),
+    "mimo-v2.5": (0.14, 0.28),
+    "mimo-v2.5-pro": (0.435, 0.87),
+    "minimax-m3": (0.30, 1.20),
+    "minimax-m2.7": (0.30, 1.20),
+    "qwen3.8-max": (2.00, 6.00),
+    "qwen3.7-max": (2.50, 7.50),
+    "qwen3.7-plus": (1.20, 4.80),
+    "qwen3.6-plus": (2.00, 6.00),
+    "hy3": (0.14, 0.58),
+}
+
+
+def estimate_usd(model: str, usage: dict) -> float:
+    pin, pout = _PRICES.get(model, (0.14, 0.28))
+    tin = usage.get("prompt_tokens", 0) or 0
+    tout = usage.get("completion_tokens", 0) or 0
+    return (tin / 1e6) * pin + (tout / 1e6) * pout
 
 
 def cache_key(body: bytes) -> str:
@@ -116,10 +145,14 @@ def _prune_cache():
         pass
 
 
-def hit_count(delta: int = 0, saved: int = 0):
+def hit_count(delta: int = 0, saved: int = 0, model: str = "", usage: dict = None):
     with _stats_lock:
         _stats["hits"] += delta
         _stats["bytes_saved"] += saved
+        if usage:
+            _stats["tokens_saved"] += usage.get("prompt_tokens", 0) or 0
+            _stats["tokens_saved"] += usage.get("completion_tokens", 0) or 0
+            _stats["usd_saved"] += estimate_usd(model, usage)
         return dict(_stats)
 
 
@@ -240,6 +273,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/__stats":
             s = dict(_stats)
             s["hit_rate"] = round(s["hits"] / max(1, s["hits"] + s["misses"]), 4)
+            s["usd_saved"] = round(s["usd_saved"], 4)
             s["uptime_s"] = round(time.time() - s["started"])
             self._send_json(200, s)
             return
@@ -281,7 +315,9 @@ class Handler(BaseHTTPRequestHandler):
         note_request(key, req)
         cached = cache_load(key)
         if cached:
-            hit_count(1, len(json.dumps(cached).encode("utf-8")))
+            usage = cached.get("usage") if isinstance(cached.get("usage"), dict) else None
+            hit_count(1, len(json.dumps(cached).encode("utf-8")),
+                      model=cached.get("model", ""), usage=usage)
             if is_stream:
                 self._stream_cached(cached)
             else:
@@ -315,6 +351,7 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
             content = ""
             cid, created, model = "", int(time.time()), ""
+            usage = None
             for raw in resp:
                 line = raw.decode("utf-8", errors="replace")
                 if line.startswith("data: "):
@@ -330,6 +367,8 @@ class Handler(BaseHTTPRequestHandler):
                             cid = chunk.get("id", "")
                             model = chunk.get("model", "")
                             created = int(chunk.get("created", created))
+                        if chunk.get("usage") and isinstance(chunk["usage"], dict):
+                            usage = chunk["usage"]
                         for ch in chunk.get("choices", []):
                             delta = ch.get("delta", {})
                             content += delta.get("content") or ""
@@ -344,6 +383,7 @@ class Handler(BaseHTTPRequestHandler):
                 "choices": [{"index": 0,
                              "message": {"role": "assistant", "content": content},
                              "finish_reason": "stop"}],
+                "usage": usage,
             }
             cache_store(key, cached_resp)
         else:
