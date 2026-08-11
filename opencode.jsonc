@@ -1,31 +1,50 @@
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": [
-    "openkilo",
-    "opencode-skill-creator",
-    "./plugins/superpowers.js"
-  ],
-  "shell": "powershell",
-  "mcp": {
-    "infra-ops": {
-      "type": "local",
-      "command": ["infra-ops-mcp"],
-      "enabled": true
-    },
-    "composio": {
-      "type": "remote",
-      "url": "https://connect.composio.dev/mcp",
-      "enabled": true
-    },
-    "context7": {
-      "type": "remote",
-      "url": "https://mcp.context7.com/mcp",
-      "enabled": true
-    },
-    "open-computer-use": {
-      "type": "local",
-      "command": ["open-computer-use"],
-      "enabled": true
-    }
-  }
+﻿{
+    "$schema":  "https://opencode.ai/config.json",
+    "plugin":  [
+                   "openkilo",
+                   "opencode-skill-creator",
+                   "./plugins/superpowers.js"
+               ],
+    "shell":  "powershell",
+    "mcp":  {
+                "infra-ops":  {
+                                  "type":  "local",
+                                  "command":  [
+                                                  "infra-ops-mcp"
+                                              ],
+                                  "enabled":  true
+                              },
+                "composio":  {
+                                 "type":  "remote",
+                                 "url":  "https://connect.composio.dev/mcp",
+                                 "enabled":  true
+                             },
+                "context7":  {
+                                 "type":  "remote",
+                                 "url":  "https://mcp.context7.com/mcp",
+                                 "enabled":  true
+                             },
+                "open-computer-use":  {
+                                          "type":  "local",
+                                          "command":  [
+                                                          "open-computer-use"
+                                                      ],
+                                          "enabled":  true
+                                      },
+                "xmind":  {
+                              "type":  "local",
+                              "command":  [
+                                              "npx",
+                                              "@41px/mcp-xmind"
+                                          ],
+                              "enabled":  true
+                          }
+            },
+    "provider":  {
+                     "opencode-go":  {
+                                         "options":  {
+                                                         "baseURL":  "http://127.0.0.1:8787/v1"
+                                                     }
+                                     }
+                 }
 }

@@ -4,6 +4,9 @@
 *.bak
 .cache/
 mcp-auth.json
+.env
+__pycache__/
+*.pyc
 
 # 忽略 node_modules
 node_modules/
