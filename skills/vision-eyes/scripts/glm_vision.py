@@ -18,6 +18,8 @@ MIMO_FREE_URL = "https://opencode.ai/zen/v1/chat/completions"
 MIMO_FREE_MODEL = "mimo-v2.5-free"
 MIMO_GO_URL = "https://opencode.ai/zen/go/v1/chat/completions"
 MIMO_GO_MODEL = "mimo-v2.5"
+KIMI_GO_URL = "https://opencode.ai/zen/go/v1/chat/completions"
+KIMI_MODEL = "kimi-k3"
 MIMO_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 
 MAX_IMAGE_BYTES = 4 * 1024 * 1024
@@ -77,7 +79,7 @@ def call_zhipu(key, model, urls, prompt):
     req = urllib.request.Request(
         ZHIPU_URL,
         data=json.dumps(body).encode(),
-        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+        headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "User-Agent": MIMO_UA},
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=180) as resp:
@@ -101,7 +103,9 @@ def call_mimo(key, model, urls, prompt, url):
     msg = data["choices"][0]["message"]
     text = msg.get("content") or ""
     if not text:
-        raise RuntimeError("mimo 返回空 content（reasoning 占满输出）")
+        text = (msg.get("reasoning_content") or msg.get("reasoning") or "").strip()
+    if not text:
+        raise RuntimeError("模型返回空 content（reasoning 占满输出）")
     return text
 
 
@@ -110,7 +114,7 @@ def main():
     ap.add_argument("images", help="图片路径，多个用逗号分隔")
     ap.add_argument("prompt", nargs="?", default="描述这张图片的内容",
                     help="问题或描述要求")
-    ap.add_argument("--model", default=None, help="强制指定模型（glm-4.6v / glm-4v-plus / mimo-v2.5-free）")
+    ap.add_argument("--model", default=None, help="kimi-k3 / glm-4.6v / glm-4v-plus / mimo-v2.5-free")
     ap.add_argument("--lang", default=None, help="zh 或 en，覆盖输出语言")
     args = ap.parse_args()
 
@@ -131,7 +135,9 @@ def main():
 
     last_err = None
     if args.model:
-        if args.model.startswith("glm"):
+        if args.model == "kimi-k3":
+            chain = [(args.model, "mimo", mkey, KIMI_GO_URL)]
+        elif args.model.startswith("glm"):
             chain = [(args.model, "zhipu", zkey, ZHIPU_URL)]
         elif args.model == "mimo-v2.5-free":
             chain = [(args.model, "mimo", mkey, MIMO_FREE_URL)]
@@ -140,11 +146,14 @@ def main():
         else:
             chain = []
     else:
-        # priority: Zhipu -> MiMo Free (zen, no quota) -> MiMo Go (uses Go quota)
-        chain = [(ZHIPU_MODEL, "zhipu", zkey, ZHIPU_URL), (ZHIPU_FALLBACK, "zhipu", zkey, ZHIPU_URL)]
+        # priority: kimi-k3 (verified stable) -> Zhipu GLM -> MiMo Free
+        chain = []
+        if mkey:
+            chain.append((KIMI_MODEL, "mimo", mkey, KIMI_GO_URL))
+        chain.append((ZHIPU_MODEL, "zhipu", zkey, ZHIPU_URL))
+        chain.append((ZHIPU_FALLBACK, "zhipu", zkey, ZHIPU_URL))
         if mkey:
             chain.append((MIMO_FREE_MODEL, "mimo", mkey, MIMO_FREE_URL))
-            chain.append((MIMO_GO_MODEL, "mimo", mkey, MIMO_GO_URL))
 
     for model, prov, key, url in chain:
         try:

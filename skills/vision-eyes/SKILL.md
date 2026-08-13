@@ -1,6 +1,6 @@
 ---
 name: vision-eyes
-description: Give a text-only model (like DeepSeek) eyes via the Zhipu GLM-4.6v vision API. Use when the user asks to look at/read/describe an image, screenshot, or UI, or when a vision-capable API is needed to describe images as text. 中文触发：看图、看图片、识别图片、描述截图、UI 截图分析、读图。
+description: Give a text-only model (like DeepSeek) eyes via the opencode-go kimi-k3 vision API (Zhipu GLM fallback). Use when the user asks to look at/read/describe an image, screenshot, or UI, or when a vision-capable API is needed to describe images as text. 中文触发：看图、看图片、识别图片、描述截图、UI 截图分析、读图。
 ---
 
 # Vision Eyes
@@ -9,26 +9,19 @@ description: Give a text-only model (like DeepSeek) eyes via the Zhipu GLM-4.6v 
 
 ## 配置
 
-API key 与端点已内置在此 skill 中（用户授权配置）：
-
-- **API Key**: ``
-- **端点**: `https://open.bigmodel.cn/api/paas/v4/chat/completions`
-- **模型**: `glm-4.6v`（视觉多模态）
-
-如需覆盖配置，设置环境变量 `GLM_VISION_API_KEY`（优先于内置 key）。
+- **主模型**: `kimi-k3`（opencode-go key，自动读取本机 `~/.local/share/opencode/auth.json` 的 opencode-go key）
+- **端点**: `https://opencode.ai/zen/go/v1/chat/completions`
+- **备用**: Zhipu GLM-4.6v（key 在本 skill 的 `.env`，可用环境变量 `GLM_VISION_API_KEY` 覆盖）
 
 ## 识别链路（自动回退）
 
 按优先级依次尝试，前一个失败自动用下一个：
 
-1. **智谱 GLM-4.6v**（默认）→ 备用 `glm-4v-plus`
-2. **MiMo-V2.5 Free**（免费，不消耗 Go 配额）
-   - 端点 `https://opencode.ai/zen/v1/chat/completions`，模型 `mimo-v2.5-free`
-   - 自动读取本机 `~/.local/share/opencode/auth.json` 的 opencode-go key
-3. **MiMo-V2.5（Go）**（消耗 Go 订阅配额，最后兜底）
-   - 端点 `https://opencode.ai/zen/go/v1/chat/completions`，模型 `mimo-v2.5`
+1. **kimi-k3（opencode-go）**（默认，实测唯一稳定通过）
+2. **智谱 GLM-4.6v** → 备用 `glm-4v-plus`
+3. **MiMo-V2.5 Free**（免费，不消耗 Go 配额）
 
-智谱未配置/失效时自动落到 mimo；mimo 先试 free 版，free 不可用才用 Go 版。可用 `--model` 强制指定（`glm-4.6v` / `glm-4v-plus` / `mimo-v2.5-free` / `mimo-v2.5`）。
+可用 `--model` 强制指定（`kimi-k3` / `glm-4.6v` / `glm-4v-plus` / `mimo-v2.5-free`）。
 
 ## 用法
 

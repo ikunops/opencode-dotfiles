@@ -305,6 +305,12 @@ sequence, and how to tell you got it right.
   this to the user instead of improvising a replacement.
 - If the vision API fails, relay the error faithfully; never fabricate
   image content.
+- Installation is one command (idempotent): run
+  `powershell -ExecutionPolicy Bypass -File setup-vision.ps1` from this
+  dotfiles repo. It creates the venv, installs pillow/numpy/vtracer,
+  writes the 5 wrappers to `%LOCALAPPDATA%\Microsoft\WindowsApps`, and
+  generates the env file from your opencode-go key in auth.json
+  (kimi-k3, LANG=zh). Re-run after pulling an updated vendor/ directory.
 
 Source repository: https://github.com/Anionex/agent-vision-toolkit
 

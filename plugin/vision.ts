@@ -188,8 +188,9 @@ async function describeImage(
       throw new Error(`Vision API HTTP ${response.status}: ${body.replace(/[\r\n]/g, " ")}`);
     }
     const data: any = await response.json();
-    const content = data?.choices?.[0]?.message?.content;
-    const result =
+    const message = data?.choices?.[0]?.message ?? {};
+    const content = message.content;
+    let result =
       typeof content === "string"
         ? content
         : Array.isArray(content)
@@ -197,6 +198,13 @@ async function describeImage(
               .map((part: any) => (typeof part?.text === "string" ? part.text : ""))
               .join("")
           : "";
+    if (!result) {
+      // Thinking models (kimi-k3, ...) sometimes answer in a reasoning field
+      // with empty content; fall back to it and strip think tags.
+      const reasoning = message.reasoning_content ?? message.reasoning;
+      result =
+        typeof reasoning === "string" ? reasoning.replace(/<\/?think>/g, "").trim() : "";
+    }
     if (!result) throw new Error("Vision API returned an empty description");
     return result;
   }
