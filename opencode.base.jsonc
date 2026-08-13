@@ -15,12 +15,5 @@
       "url": "https://connect.composio.dev/mcp",
       "enabled": true
     }
-  },
-  "provider": {
-    "opencode-go": {
-      "options": {
-        "baseURL": "http://127.0.0.1:8787/v1"
-      }
-    }
   }
 }
