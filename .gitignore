@@ -25,3 +25,7 @@ __pycache__/
 *.pyc
 
 
+
+# 自动生成的网关模型注册表 / 更新检查（机器写入，不纳入版本管理）
+opencode.json
+opencode-skill-creator-update-check.json
