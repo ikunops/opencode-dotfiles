@@ -20,7 +20,7 @@ opencode-dotfiles/
 ├─ configs/
 │  └─ security/                 # 安全相关配置
 ├─ platforms/                   # 平台特定配置
-├─ plugins/                     # 插件
+├─ plugin/                       # 插件（自动发现）
 ├─ README.md                    # 总览
 └─ QUICKSTART.md                # 快速开始
 ```
@@ -323,7 +323,7 @@ git pull
 | `setup.ps1` | Windows 同步脚本 |
 | `setup.sh` | Linux/macOS 同步脚本 |
 | `skills/` | 所有 Skills |
-| `plugins/` | 所有 Plugins |
+| `plugin/` | 所有 Plugins（自动发现） |
 | `package.json` | npm 依赖（含 infra-ops-mcp） |
 | `.gitignore` | Git 忽略规则 |
 

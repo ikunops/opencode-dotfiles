@@ -69,7 +69,6 @@ Copy-Item -Path "$temp/package-lock.json" -Destination $target -Force
 
 # 复制目录
 Copy-Item -Path "$temp/skills" -Destination "$target/skills" -Recurse -Force
-Copy-Item -Path "$temp/plugins" -Destination "$target/plugins" -Recurse -Force
 Copy-Item -Path "$temp/plugin" -Destination "$target/plugin" -Recurse -Force
 
 Copy-Item -Path "$temp/setup-vision.ps1" -Destination "$target/setup-vision.ps1" -Force
