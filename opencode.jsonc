@@ -4,7 +4,7 @@
                    "openkilo",
                    "opencode-skill-creator"
                ],
-    "shell":  "powershell",
+    "shell":  "pwsh",
     "mcp":  {
                 "infra-ops":  {
                                   "type":  "local",
