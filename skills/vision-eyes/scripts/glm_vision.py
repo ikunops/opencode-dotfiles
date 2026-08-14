@@ -10,8 +10,8 @@ import urllib.request
 import urllib.error
 
 ZHIPU_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
-ZHIPU_MODEL = "glm-4.6v"
-ZHIPU_FALLBACK = "glm-4v-plus"
+ZHIPU_MODEL = "glm-4v-flash"
+ZHIPU_FALLBACK = "glm-4.6v"
 ZHIPU_KEY = ""
 
 MIMO_FREE_URL = "https://opencode.ai/zen/v1/chat/completions"
@@ -71,11 +71,11 @@ def load_image(path):
     return f"data:{mime};base64,{base64.b64encode(data).decode()}"
 
 
-def call_zhipu(key, model, urls, prompt):
+def call_zhipu(key, model, urls, prompt, max_tokens=4096):
     content = [{"type": "text", "text": prompt}]
     for u in urls:
         content.append({"type": "image_url", "image_url": {"url": u}})
-    body = {"model": model, "messages": [{"role": "user", "content": content}], "max_tokens": 2048}
+    body = {"model": model, "messages": [{"role": "user", "content": content}], "max_tokens": max_tokens}
     req = urllib.request.Request(
         ZHIPU_URL,
         data=json.dumps(body).encode(),
@@ -146,12 +146,14 @@ def main():
         else:
             chain = []
     else:
-        # priority: kimi-k3 (verified stable) -> Zhipu GLM -> MiMo Free
+        # priority: GLM-4v-flash (free, 最强) -> GLM-4.6v (free) -> mimo-v2.5 (Go, $0.14/M) -> kimi-k3 (Go) -> MiMo Free
         chain = []
-        if mkey:
-            chain.append((KIMI_MODEL, "mimo", mkey, KIMI_GO_URL))
         chain.append((ZHIPU_MODEL, "zhipu", zkey, ZHIPU_URL))
         chain.append((ZHIPU_FALLBACK, "zhipu", zkey, ZHIPU_URL))
+        if mkey:
+            chain.append((MIMO_GO_MODEL, "mimo", mkey, MIMO_GO_URL))
+        if mkey:
+            chain.append((KIMI_MODEL, "mimo", mkey, KIMI_GO_URL))
         if mkey:
             chain.append((MIMO_FREE_MODEL, "mimo", mkey, MIMO_FREE_URL))
 
@@ -160,7 +162,9 @@ def main():
             if prov == "mimo":
                 result = call_mimo(key, model, urls, prompt, url)
             else:
-                result = call_zhipu(key, model, urls, prompt)
+                # glm-4v-flash 上限 1024, glm-4.6v 推理型需要较大空间
+                mt = 1024 if model == "glm-4v-flash" else 4096
+                result = call_zhipu(key, model, urls, prompt, mt)
             print(result)
             return
         except urllib.error.HTTPError as e:
