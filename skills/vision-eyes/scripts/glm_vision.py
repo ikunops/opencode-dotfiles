@@ -10,8 +10,8 @@ import urllib.request
 import urllib.error
 
 ZHIPU_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
-ZHIPU_MODEL = "glm-4v-flash"
-ZHIPU_FALLBACK = "glm-4.6v"
+ZHIPU_MODEL = "glm-4.6v"
+ZHIPU_FALLBACK = "glm-4v-flash"
 ZHIPU_KEY = ""
 
 MIMO_FREE_URL = "https://opencode.ai/zen/v1/chat/completions"
@@ -146,24 +146,21 @@ def main():
         else:
             chain = []
     else:
-        # priority: GLM-4v-flash (free, 最强) -> GLM-4.6v (free) -> mimo-v2.5 (Go, $0.14/M) -> kimi-k3 (Go) -> MiMo Free
-        chain = []
-        chain.append((ZHIPU_MODEL, "zhipu", zkey, ZHIPU_URL))
-        chain.append((ZHIPU_FALLBACK, "zhipu", zkey, ZHIPU_URL))
-        if mkey:
-            chain.append((MIMO_GO_MODEL, "mimo", mkey, MIMO_GO_URL))
-        if mkey:
-            chain.append((KIMI_MODEL, "mimo", mkey, KIMI_GO_URL))
+        # priority: GLM-4v-flash (free) -> GLM-4.6v (free) -> mimo-v2.5-free (zen 免费视觉)
+        #            -> mimo-v2.5 (Go, $0.14/M 便宜) -> kimi-k3 (Go, $3/M 消耗大最后才用)
+        chain = [(ZHIPU_MODEL, "zhipu", zkey, ZHIPU_URL), (ZHIPU_FALLBACK, "zhipu", zkey, ZHIPU_URL)]
         if mkey:
             chain.append((MIMO_FREE_MODEL, "mimo", mkey, MIMO_FREE_URL))
+            chain.append((MIMO_GO_MODEL, "mimo", mkey, MIMO_GO_URL))
+            chain.append((KIMI_MODEL, "mimo", mkey, KIMI_GO_URL))
 
     for model, prov, key, url in chain:
         try:
             if prov == "mimo":
                 result = call_mimo(key, model, urls, prompt, url)
             else:
-                # glm-4v-flash 上限 1024, glm-4.6v 推理型需要较大空间
-                mt = 1024 if model == "glm-4v-flash" else 4096
+                # glm-4.6v 支持 4096
+                mt = 4096
                 result = call_zhipu(key, model, urls, prompt, mt)
             print(result)
             return

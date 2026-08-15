@@ -138,6 +138,11 @@ function loadVisionConfig(): VisionConfig | { error: string } {
 // ---------------------------------------------------------------------------
 // Describe core (ported from vision_client.describe_image).
 
+function maxTokensForModel(model: string): number {
+  if (model.includes("glm-4v-flash")) return 1024;
+  return 4096;
+}
+
 async function describeImage(
   config: VisionConfig,
   imageUrl: string,
@@ -148,7 +153,7 @@ async function describeImage(
   if (config.lang) text = LANG_INSTRUCTIONS[config.lang] + "\n\n" + text;
   const payload = {
     model: config.model,
-    max_tokens: 4096,
+    max_tokens: maxTokensForModel(config.model),
     messages: [
       {
         role: "user",

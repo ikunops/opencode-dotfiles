@@ -11,18 +11,18 @@ description: Give a text-only model (like DeepSeek) eyes via Zhipu GLM-4v-flash 
 
 - **主模型**: 智谱 GLM-4v-flash（免费，key 在本 skill 的 `.env`，可用环境变量 `GLM_VISION_API_KEY` 覆盖）
 - **端点**: `https://open.bigmodel.cn/api/paas/v4/chat/completions`
-- **备用**: mimo-v2.5（Go，$0.14/M，比 kimi-k3 便宜 21 倍）/ kimi-k3（Go，key 自动读取 `~/.local/share/opencode/auth.json` 的 opencode-go key）
+- **备用**: mimo-v2.5-free（zen 免费视觉）/ kimi-k3（Go 付费兜底，key 自动读取 `~/.local/share/opencode/auth.json` 的 opencode-go key）
 
 ## 识别链路（自动回退）
 
 按优先级依次尝试，前一个失败自动用下一个：
 
-1. **智谱 GLM-4v-flash**（免费，识图最强）→ 备用 `glm-4.6v`（免费，推理型需较大 max_tokens）
-2. **mimo-v2.5（opencode-go）**（$0.14/M，识图与 kimi-k3 相当）
-3. **kimi-k3（opencode-go）**（$3/M，兜底）
-4. **MiMo-V2.5 Free**（免费，不消耗 Go 配额）
+1. **智谱 GLM-4v-flash**（免费，主力）→ 备用 `glm-4.6v`（免费）
+2. **MiMo-V2.5 Free**（zen 免费，具备视觉，不消耗 Go 配额；实测免费模型中唯一支持图片的）
+3. **mimo-v2.5（opencode-go）**（$0.14/M，便宜）
+4. **kimi-k3（opencode-go）**（付费兜底，$3/M，消耗大最后才用）
 
-可用 `--model` 强制指定（`kimi-k3` / `glm-4v-flash` / `glm-4.6v` / `mimo-v2.5` / `mimo-v2.5-free`）。
+可用 `--model` 强制指定（`glm-4v-flash` / `glm-4.6v` / `mimo-v2.5-free` / `kimi-k3` / `mimo-v2.5`）。
 
 ## 用法
 
