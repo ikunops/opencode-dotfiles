@@ -26,6 +26,13 @@ Pair a distinctive display face with a refined body face. Avoid Inter, Roboto, A
 
 Commit to a cohesive palette. Dominant colors with one or two sharp accents outperform timid even distribution. Use oklch for accents so chroma and lightness stay consistent across hues. Restrict neutrals to chroma ≤ 0.02.
 
+## Color resources
+
+- 渐变色彩库：https://www.qijishow.com/Colors/gradient
+- 中国色彩：https://www.qijishow.com/Colors/color
+- 潘通年度：https://www.qijishow.com/Colors/pantone
+- 色彩搭配：https://www.qijishow.com/Colors/pick
+
 ## Motion
 
 One or two high-impact motion moments beat a dozen scattered micro-interactions. Favor CSS-only animation: transforms, transitions, `@keyframes`, `scroll-timeline` where it is supported. Reserve JS for motion that depends on state.
