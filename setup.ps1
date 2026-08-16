@@ -71,6 +71,7 @@ Copy-Item -Path "$temp/package-lock.json" -Destination $target -Force
 Copy-Item -Path "$temp/skills" -Destination "$target/skills" -Recurse -Force
 Copy-Item -Path "$temp/plugin" -Destination "$target/plugin" -Recurse -Force
 
+Copy-Item -Path "$temp/AGENTS.md" -Destination "$target/AGENTS.md" -Force
 Copy-Item -Path "$temp/setup-vision.ps1" -Destination "$target/setup-vision.ps1" -Force
 
 # Install vision toolkit CLIs (glance/ground/detect/trace/crop), idempotent
